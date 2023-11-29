@@ -1,0 +1,145 @@
+Resume Materi Migration, Seeder, dan MVC
+a. Migration
+Migration dalam pengembangan web PHP, khususnya menggunakan kerangka kerja Laravel, adalah proses pengubahan skema database secara sistematis dan dapat diatur. Migration memungkinkan Anda untuk mengubah skema database dengan mudah dan efisien tanpa harus mengubah kode manual.
+Langkah-langkah Penggunaan Migration:
+    -Konfigurasi Koneksi Database: Pastikan Anda telah mengatur koneksi database di file .env proyek Anda.
+    -Membuat Model dan Migration: Buat model dan migration untuk mengelola entitas yang akan Anda tambahkan atau ubah dalam database. Anda dapat menggunakan perintah php artisan make:model untuk membuat model baru dan perintah php artisan make:migration untuk membuat migration baru.
+    -Menambahkan Field di dalam Migration: Buka file migration yang baru di dalam folder database/migrations. Ubah metode up() dalam migration untuk menambahkan field baru ke dalam table yang akan dibuat.
+    -Menjalankan Migration: Jalankan perintah berikut untuk melakukan migrasi: php artisan migrate.
+b. Seeder
+Seeder dalam pengembangan web adalah sebuah fitur yang memungkinkan pengembang untuk mengisi database dengan data awal secara otomatis. Seeder sangat berguna dalam tahap pengembangan, uji coba, dan pemeliharaan aplikasi untuk mengisi data ke dalam database.
+Langkah-langkah Penggunaan Seeder:
+    -Membuat Seeder: Buat file seeder dengan menggunakan command artisan seperti berikut: php artisan make:seeder UserSeeder.
+    -Buka File Seeder: Buka file seeder yang sudah dibuat. Pada metode run(), kita dapat menuliskan kode seeder untuk memasukkan data yang telah ditentukan ke dalam database.
+    -Menjalankan Seeder: Jalankan perintah berikut untuk memasukkan data ke dalam database dengan menggunakan seeder yang telah dibuat: php artisan db:seed --class=UserSeeder.
+c. Model-View-Controller (MVC)
+Model-View-Controller (MVC) adalah desain pola yang umum digunakan dalam pengembangan web PHP. MVC memisahkan aplikasi menjadi tiga komponen yang saling terkait: model, tampilan, dan kontroler.
+Langkah-langkah Penggunaan MVC:
+    -Model: Buat model untuk merepresentasikan data dan logika bisnis.
+    -View: Buat tampilan untuk menampilkan data kepada pengguna.
+    -Controller: Buat kontroler untuk mengatur logika aplikasi.
+
+Langkah-langkah membuat project menggunakan Laravel dengan MVC
+1. Buka terminal dan jalankan perintah berikut untuk membuat proyek Laravel baru:
+laravel new nama-proyek
+
+2. Buat migrasi dan model untuk tabel yang akan Anda gunakan. Anda dapat menggunakan perintah php artisan make:model untuk membuat model baru dan perintah php artisan make:migration untuk membuat migration baru.
+php artisan make:model NamaModel -m
+
+3. Buka file migration yang baru di dalam folder database/migrations. Ubah metode up() dalam migration untuk menambahkan field baru ke dalam table yang akan dibuat.
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('student', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('score');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('student');
+    }
+};
+
+4. Buat dan isi tabel di database menggunakan perintah php artisan migrate.
+php artisan migrate
+
+5. Buat seeder untuk mengisi database dengan data awal. Anda dapat menggunakan perintah php artisan make:seeder untuk membuat seeder baru.
+php artisan make:seeder NamaSeeder
+
+6. Buka file seeder yang baru dan ubah metode run() untuk menambahkan data ke database dengan menggunakan seeder yang telah dibuat.
+namespace Database\Seeders;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
+
+class StudentSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     * @return void
+     */
+    public function run()
+    {
+         // $data = [
+        //     ['id'=>1, 'name' => 'Nadia', 'score'=> 80],
+        //     ['id'=>2, 'name' => 'Herawati', 'score'=> 85],
+        //     ['id'=>3, 'name' => 'Cantik', 'score'=> 90],
+        // ];
+        
+        $data = [];
+        $faker = Faker::create();
+
+        for ($i = 3; $i < 57; $i++) {
+            $data[] = [
+                'id' => $i + 1,
+                'name'  => $faker->name,
+                'score' => rand(50, 100),
+            ];
+        }
+
+        DB::table('student')->insert($data);
+    }
+}
+
+7. Jalankan perintah php artisan db:seed --class=NamaSeeder untuk memasukkan data ke dalam database dengan menggunakan seeder yang telah dibuat.
+php artisan db:seed --class=NamaSeeder
+
+8. Buat controller untuk mengatur logika aplikasi. Anda dapat menggunakan perintah php artisan make:controller untuk membuat controller baru.
+php artisan make:controller NamaController
+
+9. Buat dan isi metode index() dalam controller yang baru untuk menampilkan view.
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Student;
+
+class StudentController extends Controller
+{
+    public function show($id){
+        $name = Student::find($id)->name;
+        return view('example', ['name'=> $name]);
+    }
+}
+
+10. Buat view untuk menampilkan data kepada pengguna. Anda dapat membuat file view baru di dalam folder resources/views.
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>Hi, {{$name}} !</p>
+</body>
+</html>
+
+11. Tambahkan rute di dalam file routes/web.php untuk menghubungkan controller dan view.
+php
+Route::get('/', 'NamaController@index');
+
+12. Buat model, view, dan controller untuk mengelola fitur yang diperlukan oleh aplikasi Anda. Anda dapat menggunakan perintah-perintah yang telah dijelaskan sebelumnya untuk membuat model, view, dan controller.
+
+13. Jalankan aplikasi Laravel dengan menggunakan perintah php artisan serve.
+php artisan serve
